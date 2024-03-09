@@ -34,7 +34,7 @@ public class SqlParse {
 
         List<ResultMapping> propertyResultMappings = null;
         if (isMockParam) {
-            getPropertyResultMappings(mapperParser);
+            propertyResultMappings = getPropertyResultMappings(mapperParser);
         }
 
         MapperSqlInfo info = new MapperSqlInfo(filePath, getNamespace(mapperParser), dbType.name());
