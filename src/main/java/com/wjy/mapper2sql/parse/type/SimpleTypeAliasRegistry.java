@@ -1,4 +1,4 @@
-package com.wjy.mapper2sql.type;
+package com.wjy.mapper2sql.parse.type;
 
 import java.util.Map;
 

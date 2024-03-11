@@ -1,4 +1,4 @@
-package com.wjy.mapper2sql.param;
+package com.wjy.mapper2sql.parse.param;
 
 import java.util.Collection;
 import java.util.HashSet;

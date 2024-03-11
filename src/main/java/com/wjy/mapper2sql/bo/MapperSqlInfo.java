@@ -1,7 +1,11 @@
 package com.wjy.mapper2sql.bo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import org.apache.ibatis.mapping.ResultMapping;
 
 import lombok.Data;
 
@@ -17,6 +21,7 @@ public class MapperSqlInfo {
     private String namespace;
     private String dbTypeName;
     private HashMap<String, String> sqlIdMap = new HashMap<>();
+    private List<ResultMapping> propertyResultMappings = new ArrayList<>();
 
     public MapperSqlInfo() {}
 
