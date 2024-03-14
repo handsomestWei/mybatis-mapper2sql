@@ -1,6 +1,5 @@
 package com.wjy.mapper2sql.bo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,20 +15,31 @@ import lombok.Data;
 @Data
 public class MapperSqlInfo {
 
-    private String fileName;
     private String filePath;
     private String namespace;
     private String dbTypeName;
-    private HashMap<String, String> sqlIdMap = new HashMap<>();
     private List<ResultMapping> propertyResultMappings = new ArrayList<>();
+    private HashMap<String, String> sqlIdMap = new HashMap<>();
+    private HashMap<String, SqlTestResultInfo> SqlTestResultInfoMap = new HashMap<>();
 
     public MapperSqlInfo() {}
 
     public MapperSqlInfo(String filePath, String namespace, String dbTypeName) {
-        this.fileName = new File(filePath).getName();
         this.filePath = filePath;
         this.namespace = namespace;
         this.dbTypeName = dbTypeName;
+    }
+
+    @Data
+    public class SqlTestResultInfo {
+
+        private Boolean result = false;
+        private String msg = "";
+
+        public SqlTestResultInfo(Boolean result, String msg) {
+            this.result = result;
+            this.msg = msg;
+        }
     }
 
 }

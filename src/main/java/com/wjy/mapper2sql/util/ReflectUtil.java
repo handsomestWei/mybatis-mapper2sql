@@ -8,16 +8,23 @@ import java.lang.reflect.Field;
  */
 public class ReflectUtil {
 
-    public static void setFieldValue(Object obj, String name, Object value)
+    public static void setFieldValue(boolean isSuper, Object obj, String name, Object value)
         throws NoSuchFieldException, IllegalAccessException {
         Class clz = obj.getClass();
+        if (isSuper) {
+            clz = clz.getSuperclass();
+        }
         Field field = clz.getDeclaredField(name);
         field.setAccessible(true);
         field.set(obj, value);
     }
 
-    public static Object getFieldValue(Object obj, String name) throws NoSuchFieldException, IllegalAccessException {
+    public static Object getFieldValue(boolean isSuper, Object obj, String name)
+        throws NoSuchFieldException, IllegalAccessException {
         Class clz = obj.getClass();
+        if (isSuper) {
+            clz = clz.getSuperclass();
+        }
         Field field = clz.getDeclaredField(name);
         field.setAccessible(true);
         return field.get(obj);

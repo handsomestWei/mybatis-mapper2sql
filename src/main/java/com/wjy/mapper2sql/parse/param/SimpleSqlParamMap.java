@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 无限套娃，适配ognl表达式检测
+ * 
  * @author weijiayu
  * @date 2024/3/9 11:30
  */
 public class SimpleSqlParamMap implements Map {
+
     @Override
     public int size() {
         return 0;
@@ -63,26 +66,42 @@ public class SimpleSqlParamMap implements Map {
 
     @Override
     public Set<Map.Entry> entrySet() {
+        return generateSet();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // TODO
+        // 类型相等，参数绑定时会被设值为全限定类名@数字，例com.wjy.mapper2sql.parse.param.SimpleSqlParamMap@1
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    private Set generateSet() {
         Set<Entry> set = new HashSet<>();
         set.add(new Entry<Object, Object>() {
             @Override
             public Object getKey() {
-                return "key";
+                return new SimpleSqlParamMap();
             }
 
             @Override
             public Object getValue() {
-                return "value";
+                return new SimpleSqlParamMap();
             }
 
             @Override
             public Object setValue(Object o) {
-                return null;
+                return new SimpleSqlParamMap();
             }
 
             @Override
             public boolean equals(Object o) {
-                return false;
+                return true;
             }
 
             @Override
@@ -91,15 +110,5 @@ public class SimpleSqlParamMap implements Map {
             }
         });
         return set;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
     }
 }

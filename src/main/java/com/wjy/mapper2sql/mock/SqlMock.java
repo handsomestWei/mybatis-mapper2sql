@@ -14,12 +14,11 @@ import com.wjy.mapper2sql.util.JdbcTypeMockUtil;
  */
 public class SqlMock {
 
-    public static String mockSql(String sql, DbType dbType, String targetSymbol,
-        HashMap<String, JdbcType> columnJdbcTypeMap) {
-        return mockWithLineScan(sql, dbType, targetSymbol, columnJdbcTypeMap);
+    public static String mockSql(String sql, DbType dbType, String token, HashMap<String, JdbcType> columnJdbcTypeMap) {
+        return mockWithLineScan(sql, dbType, token, columnJdbcTypeMap);
     }
 
-    private static String mockWithLineScan(String sql, DbType dbType, String targetSymbol,
+    private static String mockWithLineScan(String sql, DbType dbType, String token,
         HashMap<String, JdbcType> columnJdbcTypeMap) {
         sql = SQLUtils.format(sql, dbType);
         // TODO mock insert sql
@@ -27,7 +26,7 @@ public class SqlMock {
         String[] sqlPartArray = sql.split("\n");
         for (int i = 0; i < sqlPartArray.length; i++) {
             String sqlPart = sqlPartArray[i];
-            sb.append(mockWithLineSplitScan(sqlPart, targetSymbol, columnJdbcTypeMap));
+            sb.append(mockWithLineSplitScan(sqlPart, token, columnJdbcTypeMap));
             if (i < sqlPartArray.length - 1) {
                 sb.append("\n");
             }
@@ -35,9 +34,8 @@ public class SqlMock {
         return sb.toString();
     }
 
-    private static String mockWithLineSplitScan(String sql, String targetSymbol,
-        HashMap<String, JdbcType> columnJdbcTypeMap) {
-        if (!sql.contains(targetSymbol)) {
+    private static String mockWithLineSplitScan(String sql, String token, HashMap<String, JdbcType> columnJdbcTypeMap) {
+        if (!sql.contains(token)) {
             return sql;
         }
 
@@ -52,10 +50,10 @@ public class SqlMock {
                     columnJdbcType = JdbcType.INTEGER;
                 }
             }
-            if (columnJdbcType != null && sqlPart.contains(targetSymbol)) {
+            if (columnJdbcType != null && sqlPart.contains(token)) {
                 Object mockValue = JdbcTypeMockUtil.mockValue(columnJdbcType);
                 // TODO 暴力替换
-                sb.append(sqlPart.replace(targetSymbol, mockValue.toString()));
+                sb.append(sqlPart.replace(token, mockValue.toString()));
             } else {
                 sb.append(sqlPart);
                 if (sqlPart.lastIndexOf(".") >= 0) {
