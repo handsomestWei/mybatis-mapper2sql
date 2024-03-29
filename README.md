@@ -10,8 +10,13 @@
 ## 使用示例
 ### 1、保留参数占位符
 ```java
+// 指定扫描的mapper文件路径，也可以是整个项目
 String resource = "D:\\test-mapper.xml";
+
+// 提取sql，保留sql里的?占位符
 List<MapperSqlInfo> infos = SqlUtil.parseMapper(resource, DbType.postgresql, false);
+
+// 结果输出到控制台
 for (MapperSqlInfo mapperSqlInfo : infos) {
     OutPutUtil.toStdOut(mapperSqlInfo);
 }
@@ -33,8 +38,13 @@ WHERE d_id IN (?);
 ```
 ### 2、自动mock参数
 ```java
+// 指定扫描的mapper文件路径，也可以是整个项目
 String resource = "D:\\test-mapper.xml";
+
+// 提取sql，自动mock参数
 List<MapperSqlInfo> infos = SqlUtil.parseMapper(resource, DbType.postgresql, true);
+
+// 结果输出到控制台
 for (MapperSqlInfo mapperSqlInfo : infos) {
     OutPutUtil.toStdOut(mapperSqlInfo);
 }
@@ -56,15 +66,21 @@ WHERE d_id IN ('474e');
 ```
 ### 3、自动执行sql
 ```java
-String resource = "D:\\test-mapper.xml";
+// 指定扫描的文件夹路径，可以是整个项目
+String resource = "D:\\xxxProject";
+// 指定输出目录
+String outPutDir = "D:\\xxxProject-sql";
+// 配置jdbc连接，sql测试用
 JdbcConnProperties properties = new JdbcConnProperties(jdbcString, urlString, userName, password);
- List<MapperSqlInfo> infos = SqlUtil.parseMapperAndRunTest(resource, DbType.postgresql, properties);
-for (MapperSqlInfo mapperSqlInfo : infos) {
-    OutPutUtil.toStdOut(mapperSqlInfo);
-}
+
+// 提取sql，自动mock参数，自动执行sql，记录执行结果
+List<MapperSqlInfo> infos = SqlUtil.parseMapperAndRunTest(resource, DbType.postgresql, properties);
+
+// 结果输出到目录下文件
+OutPutUtil.toFile(outPutDir, infos);
 ```
 ```sql
----file=[test-mapper.xml], dbType=[postgresql], namespace=[com.xxx.dao.TestDao]
+---file=[d:\test-mapper.xml], dbType=[postgresql], namespace=[com.xxx.dao.TestDao]
 
 ---id=[selectByParam], testResult=[false], testMsg=[表tb_xxx不存在]
 SELECT d_id, index_code
@@ -77,58 +93,4 @@ LIMIT 4 OFFSET (0 - 1) * 8;
 ---id=[delete], testResult=[false], testMsg=[表tb_xxx不存在]
 DELETE FROM tb_xxx
 WHERE d_id IN ('474e');
-```
-
-## 源文件
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.xxx.dao.TestDao">
-    <resultMap type="XxxRecord" id="XxxRecordMap">
-        <id property="id" column="d_id" jdbcType="VARCHAR"/>
-        <result property="indexCode" column="index_code" jdbcType="VARCHAR"/>
-		<result property="createTime" column="create_time" jdbcType="VARCHAR"/>
-    </resultMap>
-
-    <delete id="delete" parameterType="java.util.List">
-        <![CDATA[ delete from tb_xxx where d_id in ]]>
-        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </delete>
-
-    <!-- 分页查询 -->
-    <select id="selectByParam" parameterType="DynamicQueryParam" resultMap="XxxRecordMap">
-        <![CDATA[ select ]]>
-        <include refid="fieldSql"/>
-		 <![CDATA[ from tb_xxx where create_time is not null]]>
-        <include refid="conditionSql"></include>
-        <include refid="orderSql"></include>
-        <include refid="pageSql"></include>
-    </select>
-
-    <sql id="conditionSql">
-        <choose>
-            <when test="queryParam.indexCodes != null">
-                <![CDATA[  and index_code in ]]>
-                <foreach item="indexCode" index="index" collection="queryParam.indexCodes" open="(" separator=","
-                         close=")">
-                    #{indexCode}
-                </foreach>
-            </when>
-        </choose>
-    </sql>
-
-    <sql id="pageSql">
-        <![CDATA[ limit #{pageSize} offset (#{pageNo} - 1) * #{pageSize}]]>
-    </sql>
-
-    <sql id="orderSql">
-        <![CDATA[order by d_id desc]]>
-    </sql>
-
-    <sql id="fieldSql">
-        <![CDATA[d_id ,index_code]]>
-    </sql>
-</mapper>
 ```
