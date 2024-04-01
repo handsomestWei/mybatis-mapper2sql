@@ -34,30 +34,30 @@ public class Main {
         }
         Properties properties = new Properties();
         properties.load(new FileInputStream(propertiesFilePath));
-        String workDir = System.getProperty("workDir");
-        String outPutDir = System.getProperty("outPutDir");
-        String dbTypeName = System.getProperty("dbType");
-        boolean mockFlag = Boolean.getBoolean(System.getProperty("mock", "true"));
+        String workDir = properties.getProperty("workDir");
+        String outPutDir = properties.getProperty("outPutDir");
+        String dbTypeName = properties.getProperty("dbType");
+        boolean mockFlag = Boolean.getBoolean(properties.getProperty("mock", "true"));
         if (isEmpty(workDir, outPutDir, dbTypeName)) {
-			System.out.println("mapper2sql run fail!");
-			System.out.println("property [workDir, outPutDir, dbType, mock] value must be not null");
+            System.out.println("mapper2sql run fail!");
+            System.out.println("property [workDir, outPutDir, dbType] value must be not null");
             return;
         }
 
         // check dbType
         DbType dbType = DbType.of(dbTypeName);
         if (dbType == null) {
-			System.out.println("mapper2sql run fail!");
+            System.out.println("mapper2sql run fail!");
             System.out.println("property dbType value[" + dbTypeName + "]is not support in com.alibaba.druid.DbType");
-			return;
+            return;
         }
 
         // check dbConnect
         boolean connectFlag = false;
-        String dbDriver = System.getProperty("dbDriver");
-        String jdbcUrl = System.getProperty("jdbcUrl");
-        String dbUser = System.getProperty("dbUser");
-        String dbPwd = System.getProperty("dbPwd");
+        String dbDriver = properties.getProperty("dbDriver");
+        String jdbcUrl = properties.getProperty("jdbcUrl");
+        String dbUser = properties.getProperty("dbUser");
+        String dbPwd = properties.getProperty("dbPwd");
         if (isEmpty(dbDriver, jdbcUrl, dbUser, dbPwd)) {
             connectFlag = false;
         } else {
@@ -87,17 +87,16 @@ public class Main {
     }
 
     private static void printHelp() {
-		System.out.println("===========================usage=================================");
+        System.out.println("===========================usage=================================");
         System.out.println("mapper2sql, extract sql from mybatis mapper xml");
         System.out.println("\nsupport========================================================");
         System.out.println("* folder scan and batch extract");
         System.out.println("* auto mock sql param");
         System.out.println("* sql test by jdbc connect and execute");
         System.out.println("\nrun========================================================");
+        System.out.println("* eg1 [normal]: java -jar -DpFile=d:\\xxx.properties ./mapper2sql-1.0.0.jar");
         System.out.println(
-            "* eg1 [normal]: java -jar -DpFile=d:\\xxx.properties ./mapper2sql-1.0.0-jar-with-dependencies.jar");
-        System.out.println(
-            "* eg2 [run and test]: java -classpath ./Dm8JdbcDriver18-8.1.1.49.jar -jar -DpFile=d:\\xxx.properties ./mapper2sql-1.0.0-jar-with-dependencies.jar");
+            "* eg2 [run and test]: java -classpath ./Dm8JdbcDriver18-8.1.1.49.jar -jar -DpFile=d:\\xxx.properties ./mapper2sql-1.0.0.jar");
         System.out.println("\nproperties========================================================");
         System.out.println("* run eg1, the normal properties eg:\n" + "workDir=d:\\\\xxxProject\n"
             + "outPutDir=d:\\\\xxxProject-sql\n" + "dbType=postgresql\n" + "mock=true\n");
