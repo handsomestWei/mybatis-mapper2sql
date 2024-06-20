@@ -4,13 +4,27 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wjy</groupId>
     <artifactId>mapper2sql</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>mybatis-mapper2sql</name>
     <description>extract sql from mybatis mapper xml</description>
 
+    <distributionManagement>
+        <repository>
+            <id>mybatis-mapper2sql</id>
+            <url>https://maven.pkg.github.com/handsomestWei/mybatis-mapper2sql</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>mybatis-mapper2sql</id>
+            <url>https://maven.pkg.github.com/handsomestWei/mybatis-mapper2sql</url>
+        </repository>
+    </repositories>
+
     <properties>
         <mybatis.version>3.5.1</mybatis.version>
-        <druid.version>1.2.21</druid.version>
+        <druid.version>1.2.23</druid.version>
     </properties>
 
     <dependencies>
