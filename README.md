@@ -22,7 +22,7 @@ maven setting.xml servers标签增加一组git仓库下载配置
     <id>mybatis-mapper2sql</id>
     <username>handsomestWei</username>
 	<!-- read:packages -->
-    <password>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</password>
+    <password>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</password>
 </server>
 ```
 
