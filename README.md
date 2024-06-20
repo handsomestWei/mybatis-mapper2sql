@@ -2,13 +2,14 @@
 提取mybatis mapper xml sql，自动mock sql参数
 
 ## 简介
-+ 快速启动，只需提供xml文件，无需依赖环境加载dao层class
-+ 自动mock生成sql参数，尽可能
-+ 支持扫描文件目录批量提取，生成sql文件
-+ 支持配置jdbc连接，自动执行sql，记录执行是否异常
++ 快速启动，只需提供xml文件，无需依赖环境加载dao层class，无需把整个屎山项目跑起来。
++ 自动mock生成sql参数，尽可能。
++ 支持扫描文件目录批量提取，生成sql文件。
++ 支持配置jdbc连接，自动执行sql，记录执行是否异常。
 
-## 使用示例
-### 1、保留参数占位符
+## 使用方式
+### 保留参数占位符
+#### 示例代码
 ```java
 // 指定扫描的mapper文件路径，也可以是整个项目
 String resource = "D:\\test-mapper.xml";
@@ -21,6 +22,7 @@ for (MapperSqlInfo mapperSqlInfo : infos) {
     OutPutUtil.toStdOut(mapperSqlInfo);
 }
 ```
+#### 输出结果
 ```sql
 ---namespace=[com.xxx.dao.TestDao], dbType=[postgresql], file=[D:\test-mapper.xml]
 
@@ -36,7 +38,8 @@ LIMIT ? OFFSET (? - 1) * ?;
 DELETE FROM tb_xxx
 WHERE d_id IN (?);
 ```
-### 2、自动mock参数
+### 支持自动mock参数
+#### 示例代码
 ```java
 // 指定扫描的mapper文件路径，也可以是整个项目
 String resource = "D:\\test-mapper.xml";
@@ -49,6 +52,7 @@ for (MapperSqlInfo mapperSqlInfo : infos) {
     OutPutUtil.toStdOut(mapperSqlInfo);
 }
 ```
+#### 输出结果
 ```sql
 ---file=[test-mapper.xml], dbType=[postgresql], namespace=[com.xxx.dao.TestDao]
 
@@ -64,7 +68,8 @@ LIMIT 4 OFFSET (0 - 1) * 8;
 DELETE FROM tb_xxx
 WHERE d_id IN ('474e');
 ```
-### 3、自动执行sql
+### 支持自动执行sql
+#### 示例代码
 ```java
 // 指定扫描的文件夹路径，可以是整个项目
 String resource = "D:\\xxxProject";
@@ -79,6 +84,7 @@ List<MapperSqlInfo> infos = SqlUtil.parseMapperAndRunTest(resource, DbType.postg
 // 结果输出到目录下文件
 OutPutUtil.toFile(outPutDir, infos);
 ```
+#### 输出结果
 ```sql
 ---file=[d:\test-mapper.xml], dbType=[postgresql], namespace=[com.xxx.dao.TestDao]
 
