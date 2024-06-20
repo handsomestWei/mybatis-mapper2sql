@@ -21,8 +21,8 @@ maven setting.xml servers标签增加一组git仓库下载配置
 <server>
     <id>mybatis-mapper2sql</id>
     <username>handsomestWei</username>
-	<!-- read:packages -->
-    <password>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</password>
+	<!-- read:packages PAT, you need base64.decode -->
+    <password>Z2hwX3NveVBRbnAwUXllRGN6dWlGZXp0ZW45Yk13UGdMeTF1SlFreA==</password>
 </server>
 ```
 
