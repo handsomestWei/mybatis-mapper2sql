@@ -8,6 +8,25 @@
 + 支持配置jdbc连接，自动执行sql，记录执行是否异常。
 
 ## 使用方式
+pom.xml增加依赖
+```
+<dependency>
+    <groupId>com.wjy</groupId>
+    <artifactId>mapper2sql</artifactId>
+    <version>${last.version}</version>
+</dependency>
+```
+maven setting.xml servers标签增加一组git仓库下载配置
+```
+<server>
+    <id>mybatis-mapper2sql</id>
+    <username>handsomestWei</username>
+	<!-- read:packages -->
+    <password>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</password>
+</server>
+```
+
+## 使用示例
 ### 保留参数占位符
 #### 示例代码
 ```java
