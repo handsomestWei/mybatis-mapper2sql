@@ -5,7 +5,8 @@
 + 快速启动，只需提供xml文件，无需依赖环境加载dao层class，无需把整个屎山项目跑起来。
 + 自动mock生成sql参数，尽可能。
 + 支持扫描文件目录批量提取，生成sql文件。
-+ 支持配置jdbc连接，自动执行sql，记录执行是否异常。
++ 支持配置jdbc连接，自动执行sql，记录执行是否异常。   
+[配套intellij plugin插件市场下载](https://plugins.jetbrains.com/plugin/25584-mybatis-mapper2sql/)
 
 ## 使用方式
 pom.xml增加依赖
