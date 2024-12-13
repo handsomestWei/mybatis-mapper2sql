@@ -3,6 +3,8 @@ package com.wjy.mapper2sql.parse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,7 +57,7 @@ public class SqlParse {
     private static Configuration createConfiguration() throws NoSuchFieldException, IllegalAccessException {
         Configuration configuration = new Configuration();
         // 自定义别名处理器，跳过class加载
-        ReflectUtil.setFieldValue(false, configuration, "typeAliasRegistry", new SimpleTypeAliasRegistry());
+        ReflectUtil.setFieldValueMaxDeep1(configuration, "typeAliasRegistry", new SimpleTypeAliasRegistry());
         return configuration;
     }
 
@@ -71,14 +73,14 @@ public class SqlParse {
     private static String getNamespace(XMLMapperBuilder mapperParser)
         throws NoSuchFieldException, IllegalAccessException {
         MapperBuilderAssistant builderAssistant =
-            (MapperBuilderAssistant)ReflectUtil.getFieldValue(false, mapperParser, "builderAssistant");
+            (MapperBuilderAssistant)ReflectUtil.getFieldValueMaxDeep1(mapperParser, "builderAssistant");
         return builderAssistant.getCurrentNamespace();
     }
 
     private static List<ResultMapping> getPropertyResultMappings(XMLMapperBuilder mapperParser) {
         try {
             Set<ResultMap> resultMapSet =
-                mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
+                    mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
             if (resultMapSet.isEmpty()) {
                 return null;
             } else {
@@ -101,7 +103,7 @@ public class SqlParse {
             // 存储写有“${}”或者具有动态sql标签的sql信息
             // 1、自定义参数对象，递归解析时支持无限套娃，用来适配ognl表达式的getProperties校验
             DynamicContext context = new DynamicContext(configuration, new SimpleSqlParamMap());
-            SqlNode rootSqlNode = (SqlNode)ReflectUtil.getFieldValue(false, sqlSource, "rootSqlNode");
+            SqlNode rootSqlNode = (SqlNode)ReflectUtil.getFieldValueMaxDeep1(sqlSource, "rootSqlNode");
             // 2、重置if标签，自动满足test条件
             rootSqlNode = resetIfSqlNode(rootSqlNode);
             rootSqlNode.apply(context);
@@ -124,18 +126,16 @@ public class SqlParse {
     private static SqlNode resetIfSqlNode(SqlNode sqlNode) {
         try {
             String fieldName = "contents";
-            boolean isSuper = false;
             if (sqlNode instanceof IfSqlNode) {
-                sqlNode = new SimpleIfSqlNode((SqlNode)ReflectUtil.getFieldValue(isSuper, sqlNode, fieldName));
+                sqlNode = new SimpleIfSqlNode((SqlNode)ReflectUtil.getFieldValueMaxDeep1(sqlNode, fieldName));
             } else if (sqlNode instanceof TrimSqlNode) {
                 sqlNode = (TrimSqlNode)sqlNode;
-                isSuper = true;
             } else if (sqlNode instanceof ChooseSqlNode) {
                 sqlNode = (ChooseSqlNode)sqlNode;
                 fieldName = "ifSqlNodes";
             }
             // 处理子节点
-            Object fieldValue = ReflectUtil.getFieldValue(isSuper, sqlNode, fieldName);
+            Object fieldValue = ReflectUtil.getFieldValueMaxDeep1(sqlNode, fieldName);
             if (fieldValue == null) {
                 return sqlNode;
             }
@@ -146,7 +146,7 @@ public class SqlParse {
                     contents.set(i, resetIfSqlNode(subSqlNode));
                 }
             } else if (fieldValue instanceof SqlNode) {
-                ReflectUtil.setFieldValue(isSuper, sqlNode, fieldName, resetIfSqlNode((SqlNode)fieldValue));
+                ReflectUtil.setFieldValueMaxDeep1(sqlNode, fieldName, resetIfSqlNode((SqlNode)fieldValue));
             }
         } catch (NoSuchFieldException e) {
             // ignore
