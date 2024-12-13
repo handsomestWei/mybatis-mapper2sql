@@ -78,22 +78,29 @@ public class SqlParse {
     }
 
     private static List<ResultMapping> getPropertyResultMappings(XMLMapperBuilder mapperParser) {
+        List<ResultMapping> resultMappingList = new ArrayList<>();
         try {
-            Set<ResultMap> resultMapSet =
-                    mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
-            if (resultMapSet.isEmpty()) {
-                return null;
-            } else {
-                return resultMapSet.iterator().next().getPropertyResultMappings();
+            try {
+                Set<ResultMap> resultMapSet =
+                        mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
+                if (!resultMapSet.isEmpty()) {
+                    // 合并所有结果集
+                    Iterator<ResultMap> it = resultMapSet.iterator();
+                    while (it.hasNext()) {
+                        resultMappingList.addAll(it.next().getPropertyResultMappings());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return resultMappingList;
     }
 
     /**
-     * @see org.apache.ibatis.scripting.xmltags.DynamicSqlSource#getBoundSql
+     * @see DynamicSqlSource#getBoundSql
      * @see org.apache.ibatis.builder.SqlSourceBuilder#parse
      */
     private static String parseSql(MappedStatement mp, Configuration configuration) throws Exception {
