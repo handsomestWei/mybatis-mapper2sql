@@ -1,11 +1,11 @@
 package com.wjy.mapper2sql.util;
 
+import org.apache.ibatis.type.JdbcType;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
-
-import org.apache.ibatis.type.JdbcType;
 
 /**
  * @author weijiayu
@@ -22,6 +22,7 @@ public class JdbcTypeMockUtil {
             case ARRAY:
             case CLOB:
                 return String.format("'%s'", UUID.randomUUID().toString().substring(0, 4));
+            case SMALLINT:
             case INTEGER:
             case FLOAT:
             case DOUBLE:
