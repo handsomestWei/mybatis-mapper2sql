@@ -60,6 +60,15 @@ DELETE FROM tb_xxx
 WHERE d_id IN (?);
 ```
 ### 支持自动mock参数
+#### 使用前提
+在mapper xml中，需要使用resultMap标签定义字段名称和jdbcType类型。例如
+```
+<resultMap type="com.xxx.XEntity" id="xxxResult">
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
+</resultMap>
+```
+目前不支持insert语句的参数mock
+
 #### 示例代码
 ```java
 // 指定扫描的mapper文件路径，也可以是整个项目
@@ -90,6 +99,9 @@ DELETE FROM tb_xxx
 WHERE d_id IN ('474e');
 ```
 ### 支持自动执行sql
+#### 使用前提
+在工程中，添加对应jdbc驱动依赖。
+
 #### 示例代码
 ```java
 // 指定扫描的文件夹路径，可以是整个项目
@@ -97,7 +109,7 @@ String resource = "D:\\xxxProject";
 // 指定输出目录
 String outPutDir = "D:\\xxxProject-sql";
 // 配置jdbc连接，sql测试用
-JdbcConnProperties properties = new JdbcConnProperties(jdbcString, urlString, userName, password);
+JdbcConnProperties properties = new JdbcConnProperties(jdbcDriver, urlString, userName, password);
 
 // 提取sql，自动mock参数，自动执行sql，记录执行结果
 List<MapperSqlInfo> infos = SqlUtil.parseMapperAndRunTest(resource, DbType.postgresql, properties);
