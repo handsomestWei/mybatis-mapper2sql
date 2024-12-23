@@ -61,13 +61,10 @@ WHERE d_id IN (?);
 ```
 ### 支持自动mock参数
 #### 使用前提
-在mapper xml中，需要使用resultMap标签定义字段名称和jdbcType类型。例如
-```
-<resultMap type="com.xxx.XEntity" id="xxxResult">
-    <result property="createTime" column="create_time" jdbcType="TIMESTAMP" />
-</resultMap>
-```
-目前不支持insert语句的参数mock
++ 方式一：在mapper xml中，使用resultMap标签定义字段名称和jdbcType类型。 
++ 方式二：配置jdbc连接，运行时从表结构动态获取字段和类型。适用于未定义resultMap的场景。   
+
+注意：目前仅支持select语句的参数mock
 
 #### 示例代码
 ```java
@@ -75,7 +72,12 @@ WHERE d_id IN (?);
 String resource = "D:\\test-mapper.xml";
 
 // 提取sql，自动mock参数
+// 使用方式一
 List<MapperSqlInfo> infos = SqlUtil.parseMapper(resource, DbType.postgresql, true);
+
+// 使用方式二
+// JdbcConnProperties properties = new JdbcConnProperties(jdbcDriver, urlString, userName, password);
+// List<MapperSqlInfo> infos = SqlUtil.parseMapper(resource, DbType.postgresql, true, properties);
 
 // 结果输出到控制台
 for (MapperSqlInfo mapperSqlInfo : infos) {

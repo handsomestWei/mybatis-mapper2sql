@@ -80,18 +80,14 @@ public class SqlParse {
     private static List<ResultMapping> getPropertyResultMappings(XMLMapperBuilder mapperParser) {
         List<ResultMapping> resultMappingList = new ArrayList<>();
         try {
-            try {
-                Set<ResultMap> resultMapSet =
-                        mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
-                if (!resultMapSet.isEmpty()) {
-                    // 合并所有结果集
-                    Iterator<ResultMap> it = resultMapSet.iterator();
-                    while (it.hasNext()) {
-                        resultMappingList.addAll(it.next().getPropertyResultMappings());
-                    }
+            Set<ResultMap> resultMapSet =
+                    mapperParser.getConfiguration().getResultMaps().stream().collect(Collectors.toSet());
+            if (!resultMapSet.isEmpty()) {
+                // 合并所有结果集
+                Iterator<ResultMap> it = resultMapSet.iterator();
+                while (it.hasNext()) {
+                    resultMappingList.addAll(it.next().getPropertyResultMappings());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         } catch (Exception e) {
             e.printStackTrace();
