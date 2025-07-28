@@ -9,9 +9,13 @@ import java.sql.DriverManager;
  */
 public class JdbcConnUtil {
 
-    public static Connection newConnect(String jdbcDriver, String jdbcUrl, String userName, String password)
-        throws Exception {
-        Class.forName(jdbcDriver);
-        return DriverManager.getConnection(jdbcUrl, userName, password);
+    public static Connection newConnect(String jdbcDriver, String jdbcUrl, String userName, String password) {
+        try {
+            Class.forName(jdbcDriver);
+            return DriverManager.getConnection(jdbcUrl, userName, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

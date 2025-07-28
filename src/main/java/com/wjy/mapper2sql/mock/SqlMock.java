@@ -2,14 +2,10 @@ package com.wjy.mapper2sql.mock;
 
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.wjy.mapper2sql.util.JdbcTypeMockUtil;
-import com.wjy.mapper2sql.util.MybatisUtil;
 import org.apache.ibatis.type.JdbcType;
 
-import java.sql.Connection;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author weijiayu
@@ -21,18 +17,8 @@ public class SqlMock {
         return mockWithLineScan(sql, dbType, token, columnJdbcTypeMap);
     }
 
-    public static String mockSql(String sql, DbType dbType, String token, Connection conn) {
-        // TODO token仅支持提取select语句from后的表名
-        List<String> tableNameList = SQLParserUtils.getTables(sql, dbType);
-        HashMap<String, JdbcType> columnJdbcTypeMap = new HashMap<>();
-        for (String tableName : tableNameList) {
-            columnJdbcTypeMap.putAll(MybatisUtil.getTableColumnType(tableName, conn));
-        }
-        return mockWithLineScan(sql, dbType, token, columnJdbcTypeMap);
-    }
-
     private static String mockWithLineScan(String sql, DbType dbType, String token,
-                                           HashMap<String, JdbcType> columnJdbcTypeMap) {
+            HashMap<String, JdbcType> columnJdbcTypeMap) {
         sql = SQLUtils.format(sql, dbType);
         // TODO mock insert sql
         StringBuilder sb = new StringBuilder();
