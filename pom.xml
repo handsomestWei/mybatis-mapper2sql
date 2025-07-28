@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wjy</groupId>
     <artifactId>mapper2sql</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>mybatis-mapper2sql</name>
     <description>extract sql from mybatis mapper xml</description>
 
@@ -43,6 +43,16 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
     </dependencies>
 
