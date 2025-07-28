@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.dao.OrderDao">
+
+    <resultMap id="OrderResultMap" type="com.test.entity.Order">
+        <id column="order_id" property="orderId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="amount" property="amount" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="OrderDetailResultMap" type="com.test.entity.OrderDetail">
+        <id column="detail_id" property="detailId" jdbcType="BIGINT"/>
+        <result column="order_id" property="orderId" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 简单查询 -->
+    <select id="selectOrderById" resultMap="OrderResultMap">
+        SELECT order_id, user_id, order_no, amount, status, create_time, update_time
+        FROM orders
+        WHERE order_id = #{orderId}
+    </select>
+
+    <!-- 复杂条件查询 -->
+    <select id="selectOrdersByCondition" resultMap="OrderResultMap">
+        SELECT o.order_id, o.user_id, o.order_no, o.amount, o.status, o.create_time, o.update_time
+        FROM orders o
+        INNER JOIN users u ON o.user_id = u.id
+        <where>
+            <if test="userId != null">
+                AND o.user_id = #{userId}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="minAmount != null">
+                AND o.amount &gt;= #{minAmount}
+            </if>
+            <if test="maxAmount != null">
+                AND o.amount &lt;= #{maxAmount}
+            </if>
+            <if test="startTime != null">
+                AND o.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND o.create_time &lt;= #{endTime}
+            </if>
+            <if test="username != null and username != ''">
+                AND u.username LIKE CONCAT('%', #{username}, '%')
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <!-- 统计查询 -->
+    <select id="countOrdersByCondition" resultType="long">
+        SELECT COUNT(*)
+        FROM orders o
+        INNER JOIN users u ON o.user_id = u.id
+        <where>
+            <if test="userId != null">
+                AND o.user_id = #{userId}
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="startTime != null">
+                AND o.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND o.create_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 聚合查询 -->
+    <select id="getOrderStatistics" resultType="map">
+        SELECT
+            COUNT(*) as total_orders,
+            SUM(amount) as total_amount,
+            AVG(amount) as avg_amount,
+            MAX(amount) as max_amount,
+            MIN(amount) as min_amount
+        FROM orders
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="startTime != null">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <!-- 插入订单 -->
+    <insert id="insertOrder" parameterType="com.test.entity.Order" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders (user_id, order_no, amount, status, create_time, update_time)
+        VALUES (#{userId}, #{orderNo}, #{amount}, #{status}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 批量插入订单详情 -->
+    <insert id="batchInsertOrderDetails" parameterType="java.util.List">
+        INSERT INTO order_details (order_id, product_id, product_name, quantity, price)
+        VALUES
+        <foreach collection="list" item="detail" separator=",">
+            (#{detail.orderId}, #{detail.productId}, #{detail.productName}, #{detail.quantity}, #{detail.price})
+        </foreach>
+    </insert>
+
+    <!-- 更新订单 -->
+    <update id="updateOrder" parameterType="com.test.entity.Order">
+        UPDATE orders
+        <set>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE order_id = #{orderId}
+    </update>
+
+    <!-- 批量更新订单状态 -->
+    <update id="batchUpdateOrderStatus">
+        UPDATE orders
+        SET status = #{status}, update_time = #{updateTime}
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </update>
+
+    <!-- 删除订单 -->
+    <delete id="deleteOrder">
+        DELETE FROM orders WHERE order_id = #{orderId}
+    </delete>
+
+    <!-- 批量删除订单 -->
+    <delete id="batchDeleteOrders">
+        DELETE FROM orders WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+    <!-- 软删除订单 -->
+    <update id="softDeleteOrder">
+        UPDATE orders
+        SET status = -1, update_time = #{updateTime}
+        WHERE order_id = #{orderId}
+    </update>
+
+</mapper>
