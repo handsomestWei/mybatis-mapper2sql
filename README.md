@@ -10,9 +10,9 @@
 
 适用于`sql预审`、`数据库迁移适配`等场景。
 
-## 配套产品
+## 配套工具
 + Intellij Plugin插件 [mybatis-mapper2sql-plugin](https://github.com/handsomestWei/mybatis-mapper2sql-plugin)：[插件市场下载](https://plugins.jetbrains.com/plugin/25584-mybatis-mapper2sql/)
-+ MCP server
++ MCP server [mybatis-mapper2sql-mcp-server](https://github.com/handsomestWei/mybatis-mapper2sql-mcp-server)
 
 ## 使用示例
 [参考](/src/test/java/com/wjy/mapper2sql/MainTest.java)

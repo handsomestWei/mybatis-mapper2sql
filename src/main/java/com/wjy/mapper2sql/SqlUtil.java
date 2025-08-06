@@ -71,13 +71,48 @@ public class SqlUtil {
         return mapperSqlInfos;
     }
 
+    public static List<MapperSqlInfo> parseMapper(@NonNull String filePath, @NonNull DbType dbType, boolean isMockParam,
+            Connection conn) throws Exception {
+        List<MapperSqlInfo> mapperSqlInfos = new LinkedList<>();
+        try (Stream<Path> paths = Files.walk(Paths.get(filePath))) {
+            paths.map(path -> path.toString()).filter(fp -> FileUtil.isMapperXml(fp)).forEach(fp -> {
+                try {
+                    mapperSqlInfos.add(parseMapperFile(fp, dbType, isMockParam, conn));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        return mapperSqlInfos;
+    }
+
     /*
      * 解析xml，并自动执行sql测试，记录执行结果
      */
     public static List<MapperSqlInfo> parseMapperAndRunTest(@NonNull String filePath, @NonNull DbType dbType,
             JdbcConnProperties connProperties) throws Exception {
         List<MapperSqlInfo> mapperSqlInfos = parseMapper(filePath, dbType, true, connProperties);
-        runTest(connProperties, mapperSqlInfos);
+        Connection conn = null;
+        try {
+            conn = JdbcConnUtil.newConnect(connProperties.getJdbcDriver(), connProperties.getJdbcUrl(),
+                    connProperties.getUserName(), connProperties.getPassword());
+            runTest(conn, mapperSqlInfos);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mapperSqlInfos;
+    }
+
+    public static List<MapperSqlInfo> parseMapperAndRunTest(@NonNull String filePath, @NonNull DbType dbType,
+            Connection conn) throws Exception {
+        List<MapperSqlInfo> mapperSqlInfos = parseMapper(filePath, dbType, true, conn);
+        runTest(conn, mapperSqlInfos);
         return mapperSqlInfos;
     }
 
@@ -139,26 +174,22 @@ public class SqlUtil {
         return columnJdbcTypeMap;
     }
 
-    private static void runTest(JdbcConnProperties connProperties, List<MapperSqlInfo> mapperSqlInfos)
-            throws Exception {
-        try (Connection conn = JdbcConnUtil.newConnect(connProperties.getJdbcDriver(), connProperties.getJdbcUrl(),
-                connProperties.getUserName(), connProperties.getPassword())) {
-            for (MapperSqlInfo mapperSqlInfo : mapperSqlInfos) {
-                for (Map.Entry<String, String> entry : mapperSqlInfo.getSqlIdMap().entrySet()) {
-                    boolean result = true;
-                    String msg = "";
-                    String sqlId = entry.getKey();
-                    String sql = entry.getValue();
-                    try {
-                        // 只要不抛异常
-                        boolean rs = conn.createStatement().execute(sql);
-                    } catch (Throwable t) {
-                        result = false;
-                        msg = t.getMessage();
-                    }
-                    mapperSqlInfo.getSqlTestResultInfoMap().put(sqlId,
-                            mapperSqlInfo.new SqlTestResultInfo(result, msg));
+    private static void runTest(Connection conn, List<MapperSqlInfo> mapperSqlInfos) throws Exception {
+        for (MapperSqlInfo mapperSqlInfo : mapperSqlInfos) {
+            for (Map.Entry<String, String> entry : mapperSqlInfo.getSqlIdMap().entrySet()) {
+                boolean result = true;
+                String msg = "";
+                String sqlId = entry.getKey();
+                String sql = entry.getValue();
+                try {
+                    // 只要不抛异常
+                    boolean rs = conn.createStatement().execute(sql);
+                } catch (Throwable t) {
+                    result = false;
+                    msg = t.getMessage();
                 }
+                mapperSqlInfo.getSqlTestResultInfoMap().put(sqlId,
+                        mapperSqlInfo.new SqlTestResultInfo(result, msg));
             }
         }
     }

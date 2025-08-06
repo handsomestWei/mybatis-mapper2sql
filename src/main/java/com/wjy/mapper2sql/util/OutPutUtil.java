@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,14 @@ public class OutPutUtil {
         }
         // TODO 生成excel或html测试报告
         return true;
+    }
+
+    public static List<List<String>> toLineList(@NonNull List<MapperSqlInfo> MapperSqlInfos) {
+        List<List<String>> lineList = new ArrayList<>();
+        for (MapperSqlInfo mapperSqlInfo : MapperSqlInfos) {
+            lineList.add(formatMapperSqlInfo(mapperSqlInfo));
+        }
+        return lineList;
     }
 
     private static List<String> formatMapperSqlInfo(MapperSqlInfo info) {
